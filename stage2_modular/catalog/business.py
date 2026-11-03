@@ -7,8 +7,12 @@ from errors import InvalidData, NotEnoughStock, NotFound
 
 def add_book(title, price_cents, stock):
     # TODO step 1: move the code from the old business.py here
-    if not title or price_cents < 0 or stock < 0:
-        raise InvalidData("Invalid book data")
+    if type(title) is not str or title == "":
+        raise InvalidData("title is required")
+    if type(price_cents) is not int or price_cents <= 0:
+        raise InvalidData("price must be a positive integer")
+    if type(stock) is not int or stock < 0:
+        raise InvalidData("stock cannot be negative")
     return persistence.save_book(title, price_cents, stock)
 
 
