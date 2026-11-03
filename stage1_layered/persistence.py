@@ -1,6 +1,3 @@
-# PERSISTENCE LAYER: stores and finds data.
-# No shop rules, no status codes. It imports nothing from the other layers.
-
 books = {}
 orders = {}
 
