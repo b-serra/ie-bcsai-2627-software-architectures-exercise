@@ -25,53 +25,50 @@ class NotEnoughStock(ShopError):
 
 
 def calculate_shipping(subtotal_cents):
-    # TODO step 2: 0 from FREE_SHIPPING_FROM cents, otherwise SHIPPING_PRICE
     if subtotal_cents >= FREE_SHIPPING_FROM:
         return 0
-    else:
-        return SHIPPING_PRICE
+    return SHIPPING_PRICE
 
 
 def add_book(title, price_cents, stock):
-    if not title or price_cents <= 0 or stock < 0:
-        raise InvalidData("Invalid book data")
+    if type(title) != str or title == "":
+        raise InvalidData("title is required")
+    if type(price_cents) != int or price_cents <= 0:
+        raise InvalidData("price must be a positive integer")
+    if type(stock) != int or stock < 0:
+        raise InvalidData("stock cannot be negative")
     return persistence.save_book(title, price_cents, stock)
 
 
-
 def list_books():
-    # TODO step 2: return all the books, using the persistence layer
     return persistence.all_books()
 
 
 def place_order(book_id, quantity):
-    # TODO step 2: move the order logic from presentation.py here.
-    #   invalid book_id or quantity -> raise InvalidData
-    #   book does not exist         -> raise NotFound
-    #   not enough stock            -> raise NotEnoughStock
-    #   otherwise: compute the price (use calculate_shipping), update the stock,
-    #   save the order and return it (use the persistence layer)
-    if quantity <= 0:
-        raise InvalidData("Quantity must be greater than zero")
+    if type(book_id) != int or type(quantity) != int or quantity < 1:
+        raise InvalidData("book_id and a positive quantity are required")
     book = persistence.find_book(book_id)
-    if not book:
-        raise NotFound("Book not found")
+    if book is None:
+        raise NotFound("book not found")
     if book["stock"] < quantity:
-        raise NotEnoughStock("Not enough stock available")
+        raise NotEnoughStock("not enough stock")
+
     subtotal = book["price_cents"] * quantity
     shipping = calculate_shipping(subtotal)
-    total = subtotal + shipping
     persistence.update_stock(book_id, book["stock"] - quantity)
-    order = {"book_id": book_id, "quantity": quantity, "subtotal_cents": subtotal, "shipping_cents": shipping, "total_cents": total}
-    return persistence.save_order(order)
-
-
+    return persistence.save_order(
+        {
+            "book_id": book_id,
+            "quantity": quantity,
+            "subtotal_cents": subtotal,
+            "shipping_cents": shipping,
+            "total_cents": subtotal + shipping,
+        }
+    )
 
 
 def get_order(order_id):
-    # TODO step 2: return the order, or raise NotFound
     order = persistence.find_order(order_id)
-    if not order:
-        raise NotFound("Order not found")
+    if order is None:
+        raise NotFound("order not found")
     return order
-
