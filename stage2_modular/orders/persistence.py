@@ -1,5 +1,3 @@
-# ORDERS - PERSISTENCE: stores and finds orders. Only the orders domain uses it.
-
 orders = {}
 
 
@@ -8,10 +6,13 @@ def reset():
 
 
 def save_order(order):
-    # TODO step 2: move the code from the old persistence.py here
-    raise NotImplementedError("TODO step 2")
+    new_id = len(orders) + 1
+    order["id"] = new_id
+    orders[new_id] = order
+    return order
 
 
 def find_order(order_id):
-    # TODO step 2: move the code from the old persistence.py here
-    raise NotImplementedError("TODO step 2")
+    if order_id in orders:
+        return orders[order_id]
+    return None
