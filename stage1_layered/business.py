@@ -51,11 +51,13 @@ def place_order(book_id, quantity):
     #   not enough stock            -> raise NotEnoughStock
     #   otherwise: compute the price (use calculate_shipping), update the stock,
     #   save the order and return it (use the persistence layer)
-    if not book_id:
+    if type(book_id) != int:
         raise InvalidData("Invalid Book ID")
     book = persistence.find_book(book_id)
     if book is None:
         raise NotFound("Book not found")
+    if type(quantity) != int or quantity < 1:
+        raise InvalidData("Invalid quantity")
     if book["stock"] < quantity:
         raise NotEnoughStock("Not enough books")
     subtotal_cents = book["price_cents"] * quantity
