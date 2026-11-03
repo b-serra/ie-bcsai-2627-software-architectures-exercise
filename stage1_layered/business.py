@@ -26,17 +26,22 @@ class NotEnoughStock(ShopError):
 
 def calculate_shipping(subtotal_cents):
     # TODO step 2: 0 from FREE_SHIPPING_FROM cents, otherwise SHIPPING_PRICE
-    raise NotImplementedError("TODO step 2")
+    if subtotal_cents >= FREE_SHIPPING_FROM:
+        return 0
+    else:
+        return SHIPPING_PRICE
 
 
 def add_book(title, price_cents, stock):
-    # TODO step 2: check the data (raise InvalidData) and save the book with persistence.save_book
-    raise NotImplementedError("TODO step 2")
+    if not title or price_cents <= 0 or stock < 0:
+        raise InvalidData("Invalid book data")
+    return persistence.save_book(title, price_cents, stock)
+
 
 
 def list_books():
     # TODO step 2: return all the books, using the persistence layer
-    raise NotImplementedError("TODO step 2")
+    return persistence.all_books()
 
 
 def place_order(book_id, quantity):
@@ -46,9 +51,27 @@ def place_order(book_id, quantity):
     #   not enough stock            -> raise NotEnoughStock
     #   otherwise: compute the price (use calculate_shipping), update the stock,
     #   save the order and return it (use the persistence layer)
-    raise NotImplementedError("TODO step 2")
+    if quantity <= 0:
+        raise InvalidData("Quantity must be greater than zero")
+    book = persistence.find_book(book_id)
+    if not book:
+        raise NotFound("Book not found")
+    if book["stock"] < quantity:
+        raise NotEnoughStock("Not enough stock available")
+    subtotal = book["price_cents"] * quantity
+    shipping = calculate_shipping(subtotal)
+    total = subtotal + shipping
+    persistence.update_stock(book_id, book["stock"] - quantity)
+    order = {"book_id": book_id, "quantity": quantity, "subtotal_cents": subtotal, "shipping_cents": shipping, "total_cents": total}
+    return persistence.save_order(order)
+
+
 
 
 def get_order(order_id):
     # TODO step 2: return the order, or raise NotFound
-    raise NotImplementedError("TODO step 2")
+    order = persistence.find_order(order_id)
+    if not order:
+        raise NotFound("Order not found")
+    return order
+
