@@ -1,13 +1,17 @@
-# Creates the shop, starting with no books and no orders.
-#
-# STARTING POINT: the shop still uses the layered code from stage 1
-# (business.py, persistence.py, presentation.py).
-# In step 3 you will build it from the catalog/ and orders/ domains instead.
+from catalog import persistence as catalog_store
+from catalog import presentation as catalog_api
+from orders import persistence as orders_store
+from orders import presentation as orders_api
 
-import persistence
-from presentation import ShopAPI
+
+class ShopAPI:
+    add_book = staticmethod(catalog_api.add_book)
+    list_books = staticmethod(catalog_api.list_books)
+    place_order = staticmethod(orders_api.place_order)
+    get_order = staticmethod(orders_api.get_order)
 
 
 def create_app():
-    persistence.reset()
+    catalog_store.reset()
+    orders_store.reset()
     return ShopAPI()
