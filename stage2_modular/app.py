@@ -6,6 +6,8 @@
 
 import persistence
 from presentation import ShopAPI
+from catalog import persistence as catalog
+from orders import persistence as orders
 
 
 def create_app():

@@ -3,7 +3,7 @@
 # Orders never touches the catalog's persistence.
 
 from catalog import business as catalog
-from errors import InvalidData, NotFound
+from errors import InvalidData, NotEnoughStock, NotFound
 from orders import persistence
 
 FREE_SHIPPING_FROM = 5000  # cents
@@ -12,15 +12,50 @@ SHIPPING_PRICE = 499  # cents
 
 def calculate_shipping(subtotal_cents):
     # TODO step 2: move the code from the old business.py here
-    raise NotImplementedError("TODO step 2")
+    if subtotal_cents >= FREE_SHIPPING_FROM:
+        return 0
+    return SHIPPING_PRICE
 
 
 def place_order(book_id, quantity):
     # TODO step 2: move the code from the old business.py here, but everything about the book
     #   goes through the catalog: catalog.get_price() and catalog.take_stock()
-    raise NotImplementedError("TODO step 2")
+    if type(book_id) != int or type(quantity) != int or book_id <= 0 or quantity < 1:
+        raise InvalidData("book_id and a positive quantity are required")
+    
+    book = catalog.find_book(book_id)
+    
+    if book is None:
+        raise NotFound("book not found")
+    
+    if book["stock"] < quantity:
+        raise NotEnoughStock("not enough stock")
+    
+    subtotal = book["price_cents"] * quantity
+    shipping = calculate_shipping(subtotal)
+    
+    total = subtotal + shipping
+    
+    catalog.take_stock(book_id, quantity)
+    
+    order = persistence.save_order(
+        {
+        "book_id": book_id,
+        "quantity": quantity,
+        "subtotal_cents": subtotal,
+        "shipping_cents": shipping,
+        "total_cents": total,
+        }
+    )
+    
+    return order
 
 
 def get_order(order_id):
     # TODO step 2: move the code from the old business.py here
-    raise NotImplementedError("TODO step 2")
+    order = persistence.find_order(order_id)
+    
+    if order is None:
+        raise NotFound("order not found")
+    
+    return order
