@@ -5,10 +5,15 @@ from errors import ShopError, error_response
 
 
 def add_book(request):
-    # TODO step 1: move the code from the old presentation.py here
-    raise NotImplementedError("TODO step 1")
+    try:
+        title = request.get("title")
+        price = request.get("price_cents")
+        stock = request.get("stock")
+        book = business.add_book(title, price, stock)
+        return 201, book
+    except business.InvalidData as e:
+        return 400, {"error": str(e)}
 
 
 def list_books():
-    # TODO step 1: move the code from the old presentation.py here
-    raise NotImplementedError("TODO step 1")
+    return 200, business.list_books()

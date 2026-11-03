@@ -5,10 +5,18 @@ from orders import business
 
 
 def place_order(request):
-    # TODO step 2: move the code from the old presentation.py here
-    raise NotImplementedError("TODO step 2")
+    try:
+        book_id = request.get("book_id")
+        quantity = request.get("quantity")
+        order = business.place_order(book_id, quantity)
+        return 201, order
+    except ShopError as e:
+        return error_response(e)
 
 
 def get_order(order_id):
-    # TODO step 2: move the code from the old presentation.py here
-    raise NotImplementedError("TODO step 2")
+    try:
+        order = business.get_order(order_id)
+        return 200, order
+    except ShopError as e:
+        return error_response(e)
