@@ -1,25 +1,17 @@
-# CATALOG - PERSISTENCE: stores and finds books. Only the catalog domain uses it.
+# ORDERS - PERSISTENCE: stores and finds orders. Only the orders domain uses it.
 
-books = {}
+orders = {}
 
 
 def reset():
-    books.clear()
+    orders.clear()
 
 
-def save_book(title, price_cents, stock):
-    book = {"id": len(books) + 1, "title": title, "price_cents": price_cents, "stock": stock}
-    books[book["id"]] = book
-    return book
+def save_order(order):
+    order = {"id": len(orders) + 1, **order}
+    orders[order["id"]] = order
+    return order
 
 
-def find_book(book_id):
-    return books.get(book_id)  # None if the book does not exist
-
-
-def all_books():
-    return list(books.values())
-
-
-def update_stock(book_id, new_stock):
-    books[book_id]["stock"] = new_stock
+def find_order(order_id):
+    return orders.get(order_id)  # None if the order does not exist
