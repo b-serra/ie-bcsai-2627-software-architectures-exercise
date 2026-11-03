@@ -1,13 +1,19 @@
-# Creates the shop, starting with no books and no orders.
-#
-# STARTING POINT: the shop still uses the layered code from stage 1
-# (business.py, persistence.py, presentation.py).
-# In step 3 you will build it from the catalog/ and orders/ domains instead.
+# Creates the shop from the catalog and orders domains, starting with no books and no orders.
 
-import persistence
-from presentation import ShopAPI
+from types import SimpleNamespace
+
+from catalog import persistence as catalog_persistence
+from catalog import presentation as catalog
+from orders import persistence as orders_persistence
+from orders import presentation as orders
 
 
-def create_app():
-    persistence.reset()
-    return ShopAPI()
+def create_app() -> SimpleNamespace:
+    catalog_persistence.reset()
+    orders_persistence.reset()
+    return SimpleNamespace(
+        add_book    = catalog.add_book,
+        list_books  = catalog.list_books,
+        place_order = orders.place_order,
+        get_order   = orders.get_order,
+    )
