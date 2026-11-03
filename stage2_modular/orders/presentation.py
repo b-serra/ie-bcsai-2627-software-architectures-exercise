@@ -3,12 +3,20 @@
 from errors import ShopError, error_response
 from orders import business
 
-
 def place_order(request):
-    # TODO step 2: move the code from the old presentation.py here
-    raise NotImplementedError("TODO step 2")
+    try:
+        order = business.place_order(
+            request.get("book_id"),
+            request.get("quantity")
+        )
+        return 201, order
+    except ShopError as e:
+        return error_response(e)
 
 
 def get_order(order_id):
-    # TODO step 2: move the code from the old presentation.py here
-    raise NotImplementedError("TODO step 2")
+    try:
+        return 200, business.get_order(order_id)
+    except ShopError as e:
+        return error_response(e)
+
