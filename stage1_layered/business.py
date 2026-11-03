@@ -76,3 +76,9 @@ def get_order(order_id):
     if order is None:
         raise NotFound("order not found")
     return order
+def reset_shop():
+    persistence.reset()
+
+
+def get_book(book_id):
+    return persistence.find_book(book_id)
