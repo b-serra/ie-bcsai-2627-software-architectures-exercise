@@ -26,29 +26,66 @@ class NotEnoughStock(ShopError):
 
 def calculate_shipping(subtotal_cents):
     # TODO step 2: 0 from FREE_SHIPPING_FROM cents, otherwise SHIPPING_PRICE
+    if subtotal_cents >= FREE_SHIPPING_FROM:
+        return 0
+    else:
+        return SHIPPING_PRICE
     raise NotImplementedError("TODO step 2")
 
 
 def add_book(title, price_cents, stock):
     # TODO step 2: check the data (raise InvalidData) and save the book with persistence.save_book
-    raise NotImplementedError("TODO step 2")
+    if type(title) != str or title == "":
+        raise InvalidData
+    if type(price_cents) != int or price_cents <= 0:
+        raise InvalidData
+    if type(stock) != int or stock < 0:
+        raise InvalidData
+    return persistence.save_book(title, price_cents, stock)
+    print("Added book " + title) 
 
 
 def list_books():
     # TODO step 2: return all the books, using the persistence layer
-    raise NotImplementedError("TODO step 2")
+    return persistence.all_books()
 
 
 def place_order(book_id, quantity):
+    if type(book_id) != int or type(quantity) != int or quantity < 1:
+        raise InvalidData
+
+    if persistence.books.get(book_id, None) == None:
+        raise NotFound
+    book = persistence.books[book_id]
+    if book["stock"] < quantity:
+        raise NotEnoughStock
+
+    subtotal = book["price_cents"] * quantity
+
+    book["stock"] = book["stock"] - quantity
+    order = {
+        "id": len(persistence.orders) + 1,
+        "book_id": book_id,
+        "quantity": quantity,
+        "subtotal_cents": subtotal,
+        "shipping_cents": calculate_shipping(subtotal),
+        "total_cents": subtotal + calculate_shipping(subtotal),
+    }
+    persistence.save_order(order)
+    print("Order placed for " + book["title"])
+    return order
     # TODO step 2: move the order logic from presentation.py here.
     #   invalid book_id or quantity -> raise InvalidData
     #   book does not exist         -> raise NotFound
     #   not enough stock            -> raise NotEnoughStock
     #   otherwise: compute the price (use calculate_shipping), update the stock,
     #   save the order and return it (use the persistence layer)
-    raise NotImplementedError("TODO step 2")
 
 
 def get_order(order_id):
+    order = persistence.find_order(order_id)
+    if order == None:
+        raise NotFound
+    else:
+        return order
     # TODO step 2: return the order, or raise NotFound
-    raise NotImplementedError("TODO step 2")
