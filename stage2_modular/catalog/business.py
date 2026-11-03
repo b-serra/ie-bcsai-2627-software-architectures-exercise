@@ -6,21 +6,29 @@ from errors import InvalidData, NotEnoughStock, NotFound
 
 
 def add_book(title, price_cents, stock):
-    # TODO step 1: move the code from the old business.py here
-    raise NotImplementedError("TODO step 1")
-
+    if type(title) != str or title == "":
+        raise InvalidData
+    if type(price_cents) != int or price_cents <= 0:
+        raise InvalidData
+    if type(stock) != int or stock < 0:
+        raise InvalidData
+    return persistence.save_book(title, price_cents, stock)
 
 def list_books():
-    # TODO step 1: move the code from the old business.py here
-    raise NotImplementedError("TODO step 1")
+    return list(persistence.all_books())
 
 
 def get_price(book_id):
-    # TODO step 1: new function. Return the price of the book, or raise NotFound
-    raise NotImplementedError("TODO step 1")
+    book = persistence.find_book(book_id)
+    if book is None:
+        raise NotFound
+    return book['price_cents']
 
 
 def take_stock(book_id, quantity):
-    # TODO step 1: new function. The stock check and update that were in place_order:
-    #   raise NotFound or NotEnoughStock, otherwise subtract quantity from the stock
-    raise NotImplementedError("TODO step 1")
+    book = persistence.find_book(book_id)
+    if book is None:
+        raise NotFound
+    if book["stock"] < quantity:
+        raise NotEnoughStock
+    return persistence.update_stock(book_id, book["stock"] - quantity)
