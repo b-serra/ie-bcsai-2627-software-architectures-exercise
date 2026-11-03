@@ -26,17 +26,21 @@ class NotEnoughStock(ShopError):
 
 def calculate_shipping(subtotal_cents):
     # TODO step 2: 0 from FREE_SHIPPING_FROM cents, otherwise SHIPPING_PRICE
-    raise NotImplementedError("TODO step 2")
+    if subtotal_cents >= FREE_SHIPPING_FROM:
+        return 0
+    return SHIPPING_PRICE
 
 
 def add_book(title, price_cents, stock):
     # TODO step 2: check the data (raise InvalidData) and save the book with persistence.save_book
-    raise NotImplementedError("TODO step 2")
+    if not title or price_cents < 0 or stock < 0:
+        raise InvalidData("Invalid book data")
+    return persistence.save_book(title, price_cents, stock)
 
 
 def list_books():
     # TODO step 2: return all the books, using the persistence layer
-    raise NotImplementedError("TODO step 2")
+    return persistence.all_books()
 
 
 def place_order(book_id, quantity):
@@ -46,9 +50,44 @@ def place_order(book_id, quantity):
     #   not enough stock            -> raise NotEnoughStock
     #   otherwise: compute the price (use calculate_shipping), update the stock,
     #   save the order and return it (use the persistence layer)
-    raise NotImplementedError("TODO step 2")
+       def place_order(self, request):
+        book_id = request.get("book_id")
+        quantity = request.get("quantity")
+        if type(book_id) != int or type(quantity) != int or quantity < 1:
+            raise InvalidData("Invalid book_id or quantity")
 
+        book = None
+        for b in self.books:
+            if b["id"] == book_id:
+                book = b
+        if book == None:
+            raise NotFound("Book not found")
+        if book["stock"] < quantity:
+            raise NotEnoughStock("Not enough stock")
 
-def get_order(order_id):
-    # TODO step 2: return the order, or raise NotFound
-    raise NotImplementedError("TODO step 2")
+        subtotal = book["price_cents"] * quantity
+        if subtotal >= 5000:
+            shipping = 0
+        else:
+            shipping = 499
+
+        book["stock"] = book["stock"] - quantity
+        order = {
+            "id": len(self.orders) + 1,
+            "book_id": book_id,
+            "quantity": quantity,
+            "subtotal_cents": subtotal,
+            "shipping_cents": shipping,
+            "total_cents": subtotal + shipping,
+        }
+        self.orders.append(order)
+        print("Order placed for " + book["title"])
+        persistence.update_stock(book_id, book["stock"])
+        persistence.save_order(order)
+        return 201, order
+
+def get_order(self, order_id):
+    for o in self.orders:
+        if o["id"] == order_id:
+            return 200, o
+    raise NotFound("Order not found")
