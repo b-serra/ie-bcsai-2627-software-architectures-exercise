@@ -6,7 +6,6 @@
 def create_app():
     return Shop()
 
-
 class Shop:
     def __init__(self):
         self.books = []
