@@ -6,7 +6,11 @@
 
 import persistence
 from presentation import ShopAPI
-
+import catalog.presentation as catalog
+import orders.presentation as orders
+import errors
+import orders.business as orders_business
+import catalog.business as catalog_business
 
 def create_app():
     persistence.reset()

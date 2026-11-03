@@ -2,19 +2,30 @@
 
 
 class ShopError(Exception):
-    pass
-
+    def __init__(self, message):
+        if not isinstance(self, ShopError):
+            raise TypeError("ShopError must be subclassed")
+        super().__init__(message)
 
 class InvalidData(ShopError):
-    pass
+    def __init__(self, message):
+        if not isinstance(self, InvalidData):
+            raise TypeError("InvalidData must be subclassed")
+        super().__init__(message)
 
 
 class NotFound(ShopError):
-    pass
+    def __init__(self, message):
+        if not isinstance(self, NotFound):
+            raise TypeError("NotFound must be subclassed")
+        super().__init__(message)
 
 
 class NotEnoughStock(ShopError):
-    pass
+    def __init__(self, message):
+        if not isinstance(self, NotEnoughStock):
+            raise TypeError("NotEnoughStock must be subclassed")
+        super().__init__(message)
 
 
 STATUS_CODES = {InvalidData: 400, NotFound: 404, NotEnoughStock: 409}
