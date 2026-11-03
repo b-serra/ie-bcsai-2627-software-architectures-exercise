@@ -6,21 +6,35 @@ from catalog import business as catalog
 from errors import InvalidData, NotFound
 from orders import persistence
 
-FREE_SHIPPING_FROM = 5000  # cents
-SHIPPING_PRICE = 499  # cents
+FREE_SHIPPING_FROM = 5000
+SHIPPING_PRICE     = 499
 
 
-def calculate_shipping(subtotal_cents):
-    # TODO step 2: move the code from the old business.py here
-    raise NotImplementedError("TODO step 2")
+def calculate_shipping(subtotal_cents: int) -> int:
+    if subtotal_cents >= FREE_SHIPPING_FROM:
+        return 0
+    return SHIPPING_PRICE
 
 
-def place_order(book_id, quantity):
-    # TODO step 2: move the code from the old business.py here, but everything about the book
-    #   goes through the catalog: catalog.get_price() and catalog.take_stock()
-    raise NotImplementedError("TODO step 2")
+def place_order(book_id: int, quantity: int) -> dict:
+    if type(book_id) is not int or type(quantity) is not int or quantity < 1:
+        raise InvalidData('book_id and a positive quantity are required')
+
+    subtotal = catalog.get_price(book_id) * quantity
+    shipping = calculate_shipping(subtotal)
+
+    catalog.take_stock(book_id, quantity)
+    return persistence.save_order({
+        'book_id'       : book_id,
+        'quantity'      : quantity,
+        'subtotal_cents': subtotal,
+        'shipping_cents': shipping,
+        'total_cents'   : subtotal + shipping,
+    })
 
 
-def get_order(order_id):
-    # TODO step 2: move the code from the old business.py here
-    raise NotImplementedError("TODO step 2")
+def get_order(order_id: int) -> dict:
+    order = persistence.find_order(order_id)
+    if order is None:
+        raise NotFound('order not found')
+    return order

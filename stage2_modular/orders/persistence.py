@@ -1,17 +1,20 @@
 # ORDERS - PERSISTENCE: stores and finds orders. Only the orders domain uses it.
 
-orders = {}
+orders: dict[int, dict] = {}
 
 
-def reset():
+def reset() -> None:
     orders.clear()
 
 
-def save_order(order):
-    # TODO step 2: move the code from the old persistence.py here
-    raise NotImplementedError("TODO step 2")
+def save_order(order: dict) -> dict:
+    saved = {
+        'id': len(orders) + 1,
+        **order,
+    }
+    orders[saved['id']] = saved
+    return saved
 
 
-def find_order(order_id):
-    # TODO step 2: move the code from the old persistence.py here
-    raise NotImplementedError("TODO step 2")
+def find_order(order_id: int) -> dict | None:
+    return orders.get(order_id)
