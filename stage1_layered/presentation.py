@@ -3,7 +3,7 @@
 # STARTING POINT: this file still does everything, exactly like stage 0:
 # it checks the input, applies the shop rules AND stores the data.
 # In step 3 it will only call business.py and turn errors into status codes.
-
+import business
 
 class ShopAPI:
     def __init__(self):
